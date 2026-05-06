@@ -34,7 +34,9 @@ public class EmployeeServiceImpl implements EmployeeService {
      * 员工登录
      *
      * @param employeeLoginDTO
-     * @throws AccountNotFoundException,PasswordErrorException,AccountLockedException
+     * @throws AccountNotFoundException
+     * @throws PasswordErrorException
+     * @throws AccountLockedException
      * @return employee
      */
     public Employee login(EmployeeLoginDTO employeeLoginDTO) {
@@ -70,6 +72,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     /**
      * 新增员工
      * @param employeeDTO
+     *
      */
     @Override
     public void save(EmployeeDTO employeeDTO) {
@@ -96,6 +99,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeMapper.insert(employee);
 
     }
+
+    /**
+     * 员工分页查询
+     * @param employeePageQueryDTO
+     * @return PageResult
+     */
     @Override
     public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
         //分页查询,得到页数与页码
@@ -107,5 +116,18 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<Employee> records = (List<Employee>) page.getResult();
         return new PageResult(total, records);
     }
-
+    /**
+     * 启用禁用员工账号
+     * @param status
+     * @param id
+     *
+     */
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Employee employee = Employee.builder()
+                        .id(id)
+                        .status(status)
+                        .updateTime(LocalDateTime.now()).build();
+        employeeMapper.update(employee);
+    }
 }

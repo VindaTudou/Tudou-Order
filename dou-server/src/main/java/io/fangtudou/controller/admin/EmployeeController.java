@@ -1,20 +1,23 @@
 package io.fangtudou.controller.admin;
 
 import io.fangtudou.constant.JwtClaimsConstant;
+import io.fangtudou.dto.EmployeeDTO;
 import io.fangtudou.dto.EmployeeLoginDTO;
+import io.fangtudou.dto.EmployeePageQueryDTO;
 import io.fangtudou.entity.Employee;
 import io.fangtudou.properties.JwtProperties;
+import io.fangtudou.result.PageResult;
 import io.fangtudou.result.Result;
 import io.fangtudou.service.EmployeeService;
 import io.fangtudou.utils.JwtUtil;
 import io.fangtudou.vo.EmployeeLoginVO;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +27,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/admin/employee")
 @Slf4j
+@Api(tags = "员工相关接口")
 public class EmployeeController {
 
     @Autowired
@@ -35,9 +39,10 @@ public class EmployeeController {
      * 登录
      *
      * @param employeeLoginDTO
-     * @return
+     * @return Result
      */
     @PostMapping("/login")
+    @ApiOperation("员工登录")
     public Result<EmployeeLoginVO> login(@RequestBody EmployeeLoginDTO employeeLoginDTO) {
         log.info("员工登录：{}", employeeLoginDTO);
 
@@ -64,11 +69,40 @@ public class EmployeeController {
     /**
      * 退出
      *
-     * @return
+     * @return Result
      */
     @PostMapping("/logout")
+    @ApiOperation("员工退出")
     public Result<String> logout() {
         return Result.success();
     }
 
+    /**
+     * 新增员工
+     *
+     * @param employeeDTO
+     * @return Result
+     */
+    @PostMapping
+    @ApiOperation("新增员工")
+    public Result save(@RequestBody EmployeeDTO employeeDTO){
+        log.info("新增员工：{}", employeeDTO);
+        employeeService.save(employeeDTO);
+
+        return Result.success();
+    }
+
+    /**
+     * 分页查询
+     *
+     * @param employeePageQueryDTO
+     * @return Result
+     */
+    @GetMapping("/page")
+    @ApiOperation("员工分页查询")
+    public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO){
+        log.info("员工分页查询，参数为：{}", employeePageQueryDTO);
+        PageResult pageResult = employeeService.pageQuery(employeePageQueryDTO);
+        return Result.success(pageResult);
+    }
 }

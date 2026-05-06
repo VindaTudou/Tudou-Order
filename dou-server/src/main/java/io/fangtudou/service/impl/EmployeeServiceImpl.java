@@ -1,17 +1,28 @@
 package io.fangtudou.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.Page;
+import java.util.List;
 import io.fangtudou.constant.MessageConstant;
+import io.fangtudou.constant.PasswordConstant;
 import io.fangtudou.constant.StatusConstant;
+import io.fangtudou.context.BaseContext;
+import io.fangtudou.dto.EmployeeDTO;
 import io.fangtudou.dto.EmployeeLoginDTO;
+import io.fangtudou.dto.EmployeePageQueryDTO;
 import io.fangtudou.entity.Employee;
 import io.fangtudou.exception.AccountLockedException;
 import io.fangtudou.exception.AccountNotFoundException;
 import io.fangtudou.exception.PasswordErrorException;
 import io.fangtudou.mapper.EmployeeMapper;
+import io.fangtudou.result.PageResult;
 import io.fangtudou.service.EmployeeService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+
+import java.time.LocalDateTime;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -23,7 +34,8 @@ public class EmployeeServiceImpl implements EmployeeService {
      * 员工登录
      *
      * @param employeeLoginDTO
-     * @return
+     * @throws AccountNotFoundException,PasswordErrorException,AccountLockedException
+     * @return employee
      */
     public Employee login(EmployeeLoginDTO employeeLoginDTO) {
         String username = employeeLoginDTO.getUsername();
@@ -53,6 +65,47 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         //3、返回实体对象
         return employee;
+    }
+
+    /**
+     * 新增员工
+     * @param employeeDTO
+     */
+    @Override
+    public void save(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        //对象属性拷贝
+        BeanUtils.copyProperties(employeeDTO, employee);
+
+        //设置对象状态
+        employee.setStatus(StatusConstant.ENABLE);
+
+        //设置默认密码
+        employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
+
+        //设置创建时间
+        employee.setCreateTime(LocalDateTime.now());
+
+        //设置修改时间
+        employee.setUpdateTime(LocalDateTime.now());
+
+        //设置创建人id，修改人id
+        employee.setCreateUser(BaseContext.getCurrentId());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+
+        employeeMapper.insert(employee);
+
+    }
+    @Override
+    public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
+        //分页查询,得到页数与页码
+        PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
+
+        Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
+
+        long total = page.getTotal();
+        List<Employee> records = (List<Employee>) page.getResult();
+        return new PageResult(total, records);
     }
 
 }

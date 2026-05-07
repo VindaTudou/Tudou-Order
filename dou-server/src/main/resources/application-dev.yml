@@ -6,3 +6,9 @@ tudou:
     database: tudou_take_out
     username: root
     password: ***REMOVED***
+
+  alioss:
+    endpoint: oss-cn-beijing.aliyuncs.com
+    access-key-id: ***REMOVED***
+    secret-key-secret: ***REMOVED***
+    bucket-name: sky-itcast

@@ -6,3 +6,6 @@ tudou:
     database: tudou_take_out
     username: root
     password: ***REMOVED***
+
+  upload:
+    path: /Users/fangtudou/ComputerScience/CODE/java_code/Tudou-Take-Out/images/

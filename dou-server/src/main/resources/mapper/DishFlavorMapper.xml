@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.fangtudou.mapper.DishFlavorMapper">
+
+    <insert id="insertBatch" parameterType="list">
+        insert into dish_flavor (dish_id, name, value) values
+        <foreach collection="list" item="f" separator=",">
+            (#{f.dishId}, #{f.name}, #{f.value})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByDishId">
+        delete from dish_flavor where dish_id = #{dishId}
+    </delete>
+
+    <select id="getByDishId" resultType="io.fangtudou.entity.DishFlavor">
+        select * from dish_flavor where dish_id = #{dishId}
+    </select>
+
+</mapper>

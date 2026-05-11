@@ -10,9 +10,11 @@ import io.fangtudou.context.BaseContext;
 import io.fangtudou.dto.EmployeeDTO;
 import io.fangtudou.dto.EmployeeLoginDTO;
 import io.fangtudou.dto.EmployeePageQueryDTO;
+import io.fangtudou.dto.PasswordEditDTO;
 import io.fangtudou.entity.Employee;
 import io.fangtudou.exception.AccountLockedException;
 import io.fangtudou.exception.AccountNotFoundException;
+import io.fangtudou.exception.PasswordEditFailedException;
 import io.fangtudou.exception.PasswordErrorException;
 import io.fangtudou.mapper.EmployeeMapper;
 import io.fangtudou.result.PageResult;
@@ -153,5 +155,30 @@ public class EmployeeServiceImpl implements EmployeeService {
 //        employee.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.update(employee);
+    }
+
+    /**
+     * 修改密码
+     *
+     * @param passwordEditDTO
+     */
+    @Override
+    public void editPassword(PasswordEditDTO passwordEditDTO) {
+        // 查询当前员工信息
+        Employee employee = employeeMapper.getById(passwordEditDTO.getEmpId());
+
+        // 验证旧密码（MD5加密后比对）
+        String oldPassword = DigestUtils.md5DigestAsHex(passwordEditDTO.getOldPassword().getBytes());
+        if (!oldPassword.equals(employee.getPassword())) {
+            throw new PasswordEditFailedException(MessageConstant.PASSWORD_EDIT_FAILED);
+        }
+
+        // 更新为新密码
+        Employee updateEmployee = Employee.builder()
+                .id(passwordEditDTO.getEmpId())
+                .password(DigestUtils.md5DigestAsHex(passwordEditDTO.getNewPassword().getBytes()))
+                .build();
+
+        employeeMapper.update(updateEmployee);
     }
 }

@@ -4,6 +4,7 @@ import io.fangtudou.constant.JwtClaimsConstant;
 import io.fangtudou.dto.EmployeeDTO;
 import io.fangtudou.dto.EmployeeLoginDTO;
 import io.fangtudou.dto.EmployeePageQueryDTO;
+import io.fangtudou.dto.PasswordEditDTO;
 import io.fangtudou.entity.Employee;
 import io.fangtudou.properties.JwtProperties;
 import io.fangtudou.result.PageResult;
@@ -144,6 +145,20 @@ public class EmployeeController {
     public Result update(@RequestBody EmployeeDTO employeeDTO){
         log.info("编辑员工信息:{}",employeeDTO);
         employeeService.update(employeeDTO);
+        return Result.success();
+    }
+
+    /**
+     * 修改密码
+     *
+     * @param passwordEditDTO
+     * @return Result
+     */
+    @PutMapping("/editPassword")
+    @ApiOperation("修改密码")
+    public Result editPassword(@RequestBody PasswordEditDTO passwordEditDTO) {
+        log.info("修改密码：{}", passwordEditDTO);
+        employeeService.editPassword(passwordEditDTO);
         return Result.success();
     }
 }

@@ -3,6 +3,7 @@ package io.fangtudou.service;
 import io.fangtudou.dto.EmployeeDTO;
 import io.fangtudou.dto.EmployeeLoginDTO;
 import io.fangtudou.dto.EmployeePageQueryDTO;
+import io.fangtudou.dto.PasswordEditDTO;
 import io.fangtudou.entity.Employee;
 import io.fangtudou.result.PageResult;
 
@@ -50,4 +51,10 @@ public interface EmployeeService {
      * @param employeeDTO
      */
     void update(EmployeeDTO employeeDTO);
+
+    /**
+     * 修改密码
+     * @param passwordEditDTO
+     */
+    void editPassword(PasswordEditDTO passwordEditDTO);
 }

@@ -36,36 +36,19 @@ public class SetmealServiceImpl implements SetmealService {
     @Autowired
     private CategoryMapper categoryMapper;
 
-    /**
-     * 新增套餐（含菜品关系）
-     * @param setmealDTO
-     */
     @Override
     @Transactional
     public void saveWithDish(SetmealDTO setmealDTO) {
         Setmeal setmeal = new Setmeal();
         BeanUtils.copyProperties(setmealDTO, setmeal);
+        trimStringFields(setmeal);
 
-        // trim 处理字符串字段
-        if (setmeal.getName() != null) {
-            setmeal.setName(setmeal.getName().trim());
-        }
-        if (setmeal.getImage() != null) {
-            setmeal.setImage(setmeal.getImage().trim());
-        }
-        if (setmeal.getDescription() != null) {
-            setmeal.setDescription(setmeal.getDescription().trim());
-        }
-
-        // 默认状态：停售
         if (setmeal.getStatus() == null) {
             setmeal.setStatus(StatusConstant.DISABLE);
         }
 
-        // 插入套餐（@AutoFill 自动填充时间/操作人）
         setmealMapper.insert(setmeal);
 
-        // 插入套餐菜品关系
         List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
         if (setmealDishes != null && !setmealDishes.isEmpty()) {
             for (SetmealDish setmealDish : setmealDishes) {
@@ -75,60 +58,31 @@ public class SetmealServiceImpl implements SetmealService {
         }
     }
 
-    /**
-     * 套餐分页查询
-     * @param setmealPageQueryDTO
-     * @return
-     */
     @Override
     public PageResult pageQuery(SetmealPageQueryDTO setmealPageQueryDTO) {
         PageHelper.startPage(setmealPageQueryDTO.getPage(), setmealPageQueryDTO.getPageSize());
         Page<Setmeal> page = setmealMapper.pageQuery(setmealPageQueryDTO);
 
-        // 转换 Setmeal → SetmealVO，填充分类名称
         List<SetmealVO> records = page.getResult().stream().map(setmeal -> {
             SetmealVO setmealVO = new SetmealVO();
             BeanUtils.copyProperties(setmeal, setmealVO);
-            if (setmeal.getCategoryId() != null) {
-                Category category = categoryMapper.getById(setmeal.getCategoryId());
-                if (category != null) {
-                    setmealVO.setCategoryName(category.getName());
-                }
-            }
+            fillCategoryName(setmealVO, setmeal.getCategoryId());
             return setmealVO;
         }).collect(Collectors.toList());
 
         return new PageResult(page.getTotal(), records);
     }
 
-    /**
-     * 修改套餐（含菜品关系）
-     * @param setmealDTO
-     */
     @Override
     @Transactional
     public void updateWithDish(SetmealDTO setmealDTO) {
         Setmeal setmeal = new Setmeal();
         BeanUtils.copyProperties(setmealDTO, setmeal);
+        trimStringFields(setmeal);
 
-        // trim 处理字符串字段
-        if (setmeal.getName() != null) {
-            setmeal.setName(setmeal.getName().trim());
-        }
-        if (setmeal.getImage() != null) {
-            setmeal.setImage(setmeal.getImage().trim());
-        }
-        if (setmeal.getDescription() != null) {
-            setmeal.setDescription(setmeal.getDescription().trim());
-        }
-
-        // 更新套餐基本信息
         setmealMapper.update(setmeal);
-
-        // 删除旧菜品关系
         setmealDishMapper.deleteBySetmealId(setmealDTO.getId());
 
-        // 插入新菜品关系
         List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
         if (setmealDishes != null && !setmealDishes.isEmpty()) {
             for (SetmealDish setmealDish : setmealDishes) {
@@ -138,40 +92,19 @@ public class SetmealServiceImpl implements SetmealService {
         }
     }
 
-    /**
-     * 根据id查询套餐
-     * @param id
-     * @return
-     */
     @Override
     public SetmealVO getById(Long id) {
-        // 查询套餐基本信息
         Setmeal setmeal = setmealMapper.getById(id);
-
-        // 查询套餐菜品关系
         List<SetmealDish> setmealDishes = setmealDishMapper.getBySetmealId(id);
 
-        // 组装 SetmealVO
         SetmealVO setmealVO = new SetmealVO();
         BeanUtils.copyProperties(setmeal, setmealVO);
         setmealVO.setSetmealDishes(setmealDishes);
-
-        // 填充分类名称
-        if (setmeal.getCategoryId() != null) {
-            Category category = categoryMapper.getById(setmeal.getCategoryId());
-            if (category != null) {
-                setmealVO.setCategoryName(category.getName());
-            }
-        }
+        fillCategoryName(setmealVO, setmeal.getCategoryId());
 
         return setmealVO;
     }
 
-    /**
-     * 套餐起售、停售
-     * @param status
-     * @param id
-     */
     @Override
     public void startOrStop(Integer status, Long id) {
         Setmeal setmeal = Setmeal.builder()
@@ -181,27 +114,35 @@ public class SetmealServiceImpl implements SetmealService {
         setmealMapper.update(setmeal);
     }
 
-    /**
-     * 批量删除套餐
-     * @param ids
-     */
     @Override
     @Transactional
     public void deleteBatch(List<Long> ids) {
-        // 检查是否有起售中的套餐
-        for (Long id : ids) {
-            Setmeal setmeal = setmealMapper.getById(id);
-            if (setmeal != null && StatusConstant.ENABLE.equals(setmeal.getStatus())) {
-                throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ON_SALE);
+        if (setmealMapper.anyEnabled(ids) > 0) {
+            throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ON_SALE);
+        }
+
+        setmealDishMapper.deleteBySetmealIds(ids);
+        setmealMapper.deleteByIds(ids);
+    }
+
+    private void trimStringFields(Setmeal setmeal) {
+        if (setmeal.getName() != null) {
+            setmeal.setName(setmeal.getName().trim());
+        }
+        if (setmeal.getImage() != null) {
+            setmeal.setImage(setmeal.getImage().trim());
+        }
+        if (setmeal.getDescription() != null) {
+            setmeal.setDescription(setmeal.getDescription().trim());
+        }
+    }
+
+    private void fillCategoryName(SetmealVO vo, Long categoryId) {
+        if (categoryId != null) {
+            Category category = categoryMapper.getById(categoryId);
+            if (category != null) {
+                vo.setCategoryName(category.getName());
             }
         }
-
-        // 删除套餐菜品关系
-        for (Long id : ids) {
-            setmealDishMapper.deleteBySetmealId(id);
-        }
-
-        // 删除套餐
-        setmealMapper.deleteByIds(ids);
     }
 }

@@ -14,9 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * 套餐管理
- */
 @RestController
 @RequestMapping("/admin/setmeal")
 @Api(tags = "套餐相关接口")
@@ -26,11 +23,6 @@ public class SetmealController {
     @Autowired
     private SetmealService setmealService;
 
-    /**
-     * 新增套餐
-     * @param setmealDTO
-     * @return Result
-     */
     @PostMapping
     @ApiOperation("新增套餐")
     public Result save(@RequestBody SetmealDTO setmealDTO) {
@@ -39,11 +31,6 @@ public class SetmealController {
         return Result.success();
     }
 
-    /**
-     * 套餐分页查询
-     * @param setmealPageQueryDTO
-     * @return Result
-     */
     @GetMapping("/page")
     @ApiOperation("套餐分页查询")
     public Result<PageResult> page(SetmealPageQueryDTO setmealPageQueryDTO) {
@@ -52,11 +39,6 @@ public class SetmealController {
         return Result.success(pageResult);
     }
 
-    /**
-     * 修改套餐
-     * @param setmealDTO
-     * @return Result
-     */
     @PutMapping
     @ApiOperation("修改套餐")
     public Result update(@RequestBody SetmealDTO setmealDTO) {
@@ -65,11 +47,6 @@ public class SetmealController {
         return Result.success();
     }
 
-    /**
-     * 根据id查询套餐
-     * @param id
-     * @return Result
-     */
     @GetMapping("/{id}")
     @ApiOperation("根据id查询套餐")
     public Result<SetmealVO> getById(@PathVariable Long id) {
@@ -78,12 +55,6 @@ public class SetmealController {
         return Result.success(setmealVO);
     }
 
-    /**
-     * 套餐起售、停售
-     * @param status
-     * @param id
-     * @return Result
-     */
     @PostMapping("/status/{status}")
     @ApiOperation("套餐起售停售")
     public Result startOrStop(@PathVariable Integer status, Long id) {
@@ -92,11 +63,6 @@ public class SetmealController {
         return Result.success();
     }
 
-    /**
-     * 批量删除套餐
-     * @param ids
-     * @return Result
-     */
     @DeleteMapping
     @ApiOperation("批量删除套餐")
     public Result delete(@RequestParam List<Long> ids) {

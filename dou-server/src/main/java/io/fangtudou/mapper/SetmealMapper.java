@@ -18,11 +18,11 @@ public interface SetmealMapper {
 
     /**
      * 根据分类id查询套餐的数量
-     * @param id
+     * @param categoryId
      * @return
      */
     @Select("select count(id) from setmeal where category_id = #{categoryId}")
-    Integer countByCategoryId(Long id);
+    Integer countByCategoryId(@Param("categoryId") Long categoryId);
 
     /**
      * 新增套餐
@@ -61,4 +61,14 @@ public interface SetmealMapper {
      * @param ids
      */
     void deleteByIds(@Param("ids") List<Long> ids);
+
+    /**
+     * 统计给定id列表中启售套餐的数量
+     * @param ids
+     * @return
+     */
+    @Select("<script>select count(id) from setmeal where id in " +
+            "<foreach collection='ids' item='id' open='(' separator=',' close=')'>#{id}</foreach>" +
+            " and status = 1</script>")
+    int anyEnabled(@Param("ids") List<Long> ids);
 }

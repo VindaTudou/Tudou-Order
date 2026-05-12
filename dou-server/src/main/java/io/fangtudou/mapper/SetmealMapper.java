@@ -8,7 +8,10 @@ import io.fangtudou.enumeration.OperationType;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 @Mapper
 public interface SetmealMapper {
@@ -52,4 +55,10 @@ public interface SetmealMapper {
      */
     @Select("select * from setmeal where id = #{id}")
     Setmeal getById(Long id);
+
+    /**
+     * 批量删除套餐
+     * @param ids
+     */
+    void deleteByIds(@Param("ids") List<Long> ids);
 }

@@ -3,8 +3,9 @@ package io.fangtudou.service;
 import io.fangtudou.dto.SetmealDTO;
 import io.fangtudou.dto.SetmealPageQueryDTO;
 import io.fangtudou.result.PageResult;
-
 import io.fangtudou.vo.SetmealVO;
+
+import java.util.List;
 
 public interface SetmealService {
 
@@ -33,4 +34,17 @@ public interface SetmealService {
      * @return
      */
     SetmealVO getById(Long id);
+
+    /**
+     * 套餐起售、停售
+     * @param status
+     * @param id
+     */
+    void startOrStop(Integer status, Long id);
+
+    /**
+     * 批量删除套餐
+     * @param ids
+     */
+    void deleteBatch(List<Long> ids);
 }

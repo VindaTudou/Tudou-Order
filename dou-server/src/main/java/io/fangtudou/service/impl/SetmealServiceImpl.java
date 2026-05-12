@@ -2,12 +2,14 @@ package io.fangtudou.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
+import io.fangtudou.constant.MessageConstant;
 import io.fangtudou.constant.StatusConstant;
 import io.fangtudou.dto.SetmealDTO;
 import io.fangtudou.dto.SetmealPageQueryDTO;
 import io.fangtudou.entity.Category;
 import io.fangtudou.entity.Setmeal;
 import io.fangtudou.entity.SetmealDish;
+import io.fangtudou.exception.DeletionNotAllowedException;
 import io.fangtudou.mapper.CategoryMapper;
 import io.fangtudou.mapper.SetmealDishMapper;
 import io.fangtudou.mapper.SetmealMapper;
@@ -163,5 +165,43 @@ public class SetmealServiceImpl implements SetmealService {
         }
 
         return setmealVO;
+    }
+
+    /**
+     * 套餐起售、停售
+     * @param status
+     * @param id
+     */
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Setmeal setmeal = Setmeal.builder()
+                .id(id)
+                .status(status)
+                .build();
+        setmealMapper.update(setmeal);
+    }
+
+    /**
+     * 批量删除套餐
+     * @param ids
+     */
+    @Override
+    @Transactional
+    public void deleteBatch(List<Long> ids) {
+        // 检查是否有起售中的套餐
+        for (Long id : ids) {
+            Setmeal setmeal = setmealMapper.getById(id);
+            if (setmeal != null && StatusConstant.ENABLE.equals(setmeal.getStatus())) {
+                throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ON_SALE);
+            }
+        }
+
+        // 删除套餐菜品关系
+        for (Long id : ids) {
+            setmealDishMapper.deleteBySetmealId(id);
+        }
+
+        // 删除套餐
+        setmealMapper.deleteByIds(ids);
     }
 }

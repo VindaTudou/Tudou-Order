@@ -4,6 +4,8 @@ import io.fangtudou.dto.SetmealDTO;
 import io.fangtudou.dto.SetmealPageQueryDTO;
 import io.fangtudou.result.PageResult;
 
+import io.fangtudou.vo.SetmealVO;
+
 public interface SetmealService {
 
     /**
@@ -24,4 +26,11 @@ public interface SetmealService {
      * @param setmealDTO
      */
     void updateWithDish(SetmealDTO setmealDTO);
+
+    /**
+     * 根据id查询套餐
+     * @param id
+     * @return
+     */
+    SetmealVO getById(Long id);
 }

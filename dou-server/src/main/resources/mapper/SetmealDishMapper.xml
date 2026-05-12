@@ -14,4 +14,8 @@
         delete from setmeal_dish where setmeal_id = #{setmealId}
     </delete>
 
+    <select id="getBySetmealId" resultType="io.fangtudou.entity.SetmealDish">
+        select * from setmeal_dish where setmeal_id = #{setmealId}
+    </select>
+
 </mapper>

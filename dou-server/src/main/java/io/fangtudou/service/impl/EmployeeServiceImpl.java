@@ -82,6 +82,20 @@ public class EmployeeServiceImpl implements EmployeeService {
         //对象属性拷贝
         BeanUtils.copyProperties(employeeDTO, employee);
 
+        // trim 处理字符串字段
+        if (employee.getName() != null) {
+            employee.setName(employee.getName().trim());
+        }
+        if (employee.getUsername() != null) {
+            employee.setUsername(employee.getUsername().trim());
+        }
+        if (employee.getPhone() != null) {
+            employee.setPhone(employee.getPhone().trim());
+        }
+        if (employee.getIdNumber() != null) {
+            employee.setIdNumber(employee.getIdNumber().trim());
+        }
+
         //设置对象状态
         employee.setStatus(StatusConstant.ENABLE);
 
@@ -150,6 +164,20 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void update(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO, employee);
+
+        // trim 处理字符串字段
+        if (employee.getName() != null) {
+            employee.setName(employee.getName().trim());
+        }
+        if (employee.getUsername() != null) {
+            employee.setUsername(employee.getUsername().trim());
+        }
+        if (employee.getPhone() != null) {
+            employee.setPhone(employee.getPhone().trim());
+        }
+        if (employee.getIdNumber() != null) {
+            employee.setIdNumber(employee.getIdNumber().trim());
+        }
 
 //        employee.setUpdateTime(LocalDateTime.now());
 //        employee.setUpdateUser(BaseContext.getCurrentId());

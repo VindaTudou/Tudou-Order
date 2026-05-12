@@ -1,6 +1,8 @@
 package io.fangtudou.controller.admin;
 
 import io.fangtudou.dto.SetmealDTO;
+import io.fangtudou.dto.SetmealPageQueryDTO;
+import io.fangtudou.result.PageResult;
 import io.fangtudou.result.Result;
 import io.fangtudou.service.SetmealService;
 import io.swagger.annotations.Api;
@@ -31,6 +33,32 @@ public class SetmealController {
     public Result save(@RequestBody SetmealDTO setmealDTO) {
         log.info("新增套餐：{}", setmealDTO);
         setmealService.saveWithDish(setmealDTO);
+        return Result.success();
+    }
+
+    /**
+     * 套餐分页查询
+     * @param setmealPageQueryDTO
+     * @return Result
+     */
+    @GetMapping("/page")
+    @ApiOperation("套餐分页查询")
+    public Result<PageResult> page(SetmealPageQueryDTO setmealPageQueryDTO) {
+        log.info("套餐分页查询：{}", setmealPageQueryDTO);
+        PageResult pageResult = setmealService.pageQuery(setmealPageQueryDTO);
+        return Result.success(pageResult);
+    }
+
+    /**
+     * 修改套餐
+     * @param setmealDTO
+     * @return Result
+     */
+    @PutMapping
+    @ApiOperation("修改套餐")
+    public Result update(@RequestBody SetmealDTO setmealDTO) {
+        log.info("修改套餐：{}", setmealDTO);
+        setmealService.updateWithDish(setmealDTO);
         return Result.success();
     }
 }

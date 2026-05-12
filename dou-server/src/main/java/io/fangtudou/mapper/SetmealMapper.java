@@ -1,6 +1,8 @@
 package io.fangtudou.mapper;
 
+import com.github.pagehelper.Page;
 import io.fangtudou.annotation.AutoFill;
+import io.fangtudou.dto.SetmealPageQueryDTO;
 import io.fangtudou.entity.Setmeal;
 import io.fangtudou.enumeration.OperationType;
 import org.apache.ibatis.annotations.Insert;
@@ -28,4 +30,18 @@ public interface SetmealMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id")
     @AutoFill(value = OperationType.INSERT)
     void insert(Setmeal setmeal);
+
+    /**
+     * 套餐分页查询
+     * @param setmealPageQueryDTO
+     * @return
+     */
+    Page<Setmeal> pageQuery(SetmealPageQueryDTO setmealPageQueryDTO);
+
+    /**
+     * 动态修改套餐
+     * @param setmeal
+     */
+    @AutoFill(value = OperationType.UPDATE)
+    void update(Setmeal setmeal);
 }

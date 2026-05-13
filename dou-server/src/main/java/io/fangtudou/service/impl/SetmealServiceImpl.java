@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -63,19 +64,20 @@ public class SetmealServiceImpl implements SetmealService {
     public PageResult pageQuery(SetmealPageQueryDTO setmealPageQueryDTO) {
         PageHelper.startPage(setmealPageQueryDTO.getPage(), setmealPageQueryDTO.getPageSize());
         Page<Setmeal> page = setmealMapper.pageQuery(setmealPageQueryDTO);
+        List<Setmeal> result = page.getResult();
 
         // 批量查询分类名称（一次 IN 查询解决 N+1）
-        List<Long> categoryIds = page.getResult().stream()
+        List<Long> categoryIds = result.stream()
                 .map(Setmeal::getCategoryId)
                 .filter(id -> id != null)
                 .distinct()
                 .collect(Collectors.toList());
         Map<Long, String> categoryNameMap = categoryIds.isEmpty()
-                ? java.util.Collections.emptyMap()
+                ? Collections.emptyMap()
                 : categoryMapper.listByIds(categoryIds).stream()
                     .collect(Collectors.toMap(Category::getId, Category::getName));
 
-        List<SetmealVO> records = page.getResult().stream().map(setmeal -> {
+        List<SetmealVO> records = result.stream().map(setmeal -> {
             SetmealVO setmealVO = new SetmealVO();
             BeanUtils.copyProperties(setmeal, setmealVO);
             setmealVO.setCategoryName(categoryNameMap.get(setmeal.getCategoryId()));

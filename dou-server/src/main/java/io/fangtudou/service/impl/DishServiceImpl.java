@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -191,20 +192,21 @@ public class DishServiceImpl implements DishService {
     public PageResult pageQuery(DishPageQueryDTO dishPageQueryDTO) {
         PageHelper.startPage(dishPageQueryDTO.getPage(), dishPageQueryDTO.getPageSize());
         Page<Dish> page = dishMapper.pageQuery(dishPageQueryDTO);
+        List<Dish> result = page.getResult();
 
         // 批量查询分类名称（一次 IN 查询解决 N+1）
-        List<Long> categoryIds = page.getResult().stream()
+        List<Long> categoryIds = result.stream()
                 .map(Dish::getCategoryId)
                 .filter(id -> id != null)
                 .distinct()
                 .collect(Collectors.toList());
         Map<Long, String> categoryNameMap = categoryIds.isEmpty()
-                ? java.util.Collections.emptyMap()
+                ? Collections.emptyMap()
                 : categoryMapper.listByIds(categoryIds).stream()
                     .collect(Collectors.toMap(Category::getId, Category::getName));
 
         // 转换 Dish → DishVO
-        List<DishVO> records = page.getResult().stream().map(dish -> {
+        List<DishVO> records = result.stream().map(dish -> {
             DishVO dishVO = new DishVO();
             BeanUtils.copyProperties(dish, dishVO);
             dishVO.setCategoryName(categoryNameMap.get(dish.getCategoryId()));

@@ -27,7 +27,10 @@ public class ShopController {
             redisTemplate.opsForValue().set(REDIS_KEY, 1);
             return Result.success(1);
         }
-        return Result.success((Integer) status);
+        if (status instanceof Number) {
+            return Result.success(((Number) status).intValue());
+        }
+        return Result.success(1);
     }
 
     @PutMapping("/{status}")

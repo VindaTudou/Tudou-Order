@@ -9,3 +9,5 @@ images
 **/application-*.yml
 .env
 *.local
+CLAUDE.md
+外卖平台修改要求

@@ -9,7 +9,7 @@
         <version>2.7.3</version>
     </parent>
     <groupId>io.fangtudou</groupId>
-    <artifactId>tudou-take-out</artifactId>
+    <artifactId>tudou-order</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>

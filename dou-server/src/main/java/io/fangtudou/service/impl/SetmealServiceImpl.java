@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -63,10 +64,21 @@ public class SetmealServiceImpl implements SetmealService {
         PageHelper.startPage(setmealPageQueryDTO.getPage(), setmealPageQueryDTO.getPageSize());
         Page<Setmeal> page = setmealMapper.pageQuery(setmealPageQueryDTO);
 
+        // 批量查询分类名称（一次 IN 查询解决 N+1）
+        List<Long> categoryIds = page.getResult().stream()
+                .map(Setmeal::getCategoryId)
+                .filter(id -> id != null)
+                .distinct()
+                .collect(Collectors.toList());
+        Map<Long, String> categoryNameMap = categoryIds.isEmpty()
+                ? java.util.Collections.emptyMap()
+                : categoryMapper.listByIds(categoryIds).stream()
+                    .collect(Collectors.toMap(Category::getId, Category::getName));
+
         List<SetmealVO> records = page.getResult().stream().map(setmeal -> {
             SetmealVO setmealVO = new SetmealVO();
             BeanUtils.copyProperties(setmeal, setmealVO);
-            fillCategoryName(setmealVO, setmeal.getCategoryId());
+            setmealVO.setCategoryName(categoryNameMap.get(setmeal.getCategoryId()));
             return setmealVO;
         }).collect(Collectors.toList());
 
@@ -100,7 +112,12 @@ public class SetmealServiceImpl implements SetmealService {
         SetmealVO setmealVO = new SetmealVO();
         BeanUtils.copyProperties(setmeal, setmealVO);
         setmealVO.setSetmealDishes(setmealDishes);
-        fillCategoryName(setmealVO, setmeal.getCategoryId());
+        if (setmeal.getCategoryId() != null) {
+            Category category = categoryMapper.getById(setmeal.getCategoryId());
+            if (category != null) {
+                setmealVO.setCategoryName(category.getName());
+            }
+        }
 
         return setmealVO;
     }
@@ -134,15 +151,6 @@ public class SetmealServiceImpl implements SetmealService {
         }
         if (setmeal.getDescription() != null) {
             setmeal.setDescription(setmeal.getDescription().trim());
-        }
-    }
-
-    private void fillCategoryName(SetmealVO vo, Long categoryId) {
-        if (categoryId != null) {
-            Category category = categoryMapper.getById(categoryId);
-            if (category != null) {
-                vo.setCategoryName(category.getName());
-            }
         }
     }
 }

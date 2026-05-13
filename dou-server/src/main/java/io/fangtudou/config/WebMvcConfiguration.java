@@ -50,10 +50,10 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     public Docket docket() {
         log.info("开始创建接口文档...");
         ApiInfo apiInfo = new ApiInfoBuilder()
-                .title("土豆外卖项目接口文档")
+                .title("土豆点餐项目接口文档")
                 .termsOfServiceUrl("io.fangtudou")
                 .version("2.0")
-                .description("土豆外卖项目接口文档")
+                .description("土豆点餐项目接口文档")
                 .build();
         Docket docket = new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo)
@@ -72,7 +72,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         log.info("开始进行静态资源映射...");
         registry.addResourceHandler("/doc.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
-        registry.addResourceHandler("/images/**").addResourceLocations("file:/Users/fangtudou/ComputerScience/Tudou-Take-Out/images/");
+        registry.addResourceHandler("/images/**").addResourceLocations("file:/Users/fangtudou/ComputerScience/Tudou-Order/images/");
     }
 
     /**

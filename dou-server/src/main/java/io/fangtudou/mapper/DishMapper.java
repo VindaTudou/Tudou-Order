@@ -77,4 +77,8 @@ public interface DishMapper {
      */
     @Select("select count(*) from setmeal_dish where dish_id = #{dishId}")
     Integer countSetmealByDishId(Long dishId);
+
+    List<Dish> getByIds(@Param("ids") List<Long> ids);
+
+    Integer countSetmealByDishIds(@Param("dishIds") List<Long> dishIds);
 }

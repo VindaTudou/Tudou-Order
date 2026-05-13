@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -121,28 +122,24 @@ public class DishServiceImpl implements DishService {
     @Override
     @Transactional
     public void deleteBatch(List<Long> ids) {
-        // 检查是否有起售中的菜品
-        for (Long id : ids) {
-            Dish dish = dishMapper.getById(id);
-            if (dish != null && StatusConstant.ENABLE.equals(dish.getStatus())) {
+        // 批量查询，检查是否有起售中的菜品
+        List<Dish> dishes = dishMapper.getByIds(ids);
+        for (Dish dish : dishes) {
+            if (StatusConstant.ENABLE.equals(dish.getStatus())) {
                 throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
             }
         }
 
-        // 检查是否有菜品关联了套餐
-        for (Long id : ids) {
-            Integer count = dishMapper.countSetmealByDishId(id);
-            if (count != null && count > 0) {
-                throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
-            }
+        // 批量检查是否有菜品关联了套餐
+        Integer count = dishMapper.countSetmealByDishIds(ids);
+        if (count != null && count > 0) {
+            throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
         }
 
-        // 删除口味数据
-        for (Long id : ids) {
-            dishFlavorMapper.deleteByDishId(id);
-        }
+        // 批量删除口味数据
+        dishFlavorMapper.deleteByDishIds(ids);
 
-        // 删除菜品
+        // 批量删除菜品
         dishMapper.deleteByIds(ids);
     }
 
@@ -195,16 +192,22 @@ public class DishServiceImpl implements DishService {
         PageHelper.startPage(dishPageQueryDTO.getPage(), dishPageQueryDTO.getPageSize());
         Page<Dish> page = dishMapper.pageQuery(dishPageQueryDTO);
 
-        // 转换 Dish → DishVO，填充分类名称
+        // 批量查询分类名称（一次 IN 查询解决 N+1）
+        List<Long> categoryIds = page.getResult().stream()
+                .map(Dish::getCategoryId)
+                .filter(id -> id != null)
+                .distinct()
+                .collect(Collectors.toList());
+        Map<Long, String> categoryNameMap = categoryIds.isEmpty()
+                ? java.util.Collections.emptyMap()
+                : categoryMapper.listByIds(categoryIds).stream()
+                    .collect(Collectors.toMap(Category::getId, Category::getName));
+
+        // 转换 Dish → DishVO
         List<DishVO> records = page.getResult().stream().map(dish -> {
             DishVO dishVO = new DishVO();
             BeanUtils.copyProperties(dish, dishVO);
-            if (dish.getCategoryId() != null) {
-                Category category = categoryMapper.getById(dish.getCategoryId());
-                if (category != null) {
-                    dishVO.setCategoryName(category.getName());
-                }
-            }
+            dishVO.setCategoryName(categoryNameMap.get(dish.getCategoryId()));
             return dishVO;
         }).collect(Collectors.toList());
 

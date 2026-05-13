@@ -2,6 +2,8 @@ package io.fangtudou.mapper;
 
 import io.fangtudou.entity.DishFlavor;
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.data.repository.query.Param;
+
 import java.util.List;
 
 @Mapper
@@ -25,4 +27,6 @@ public interface DishFlavorMapper {
      * @return
      */
     List<DishFlavor> getByDishId(Long dishId);
+
+    void deleteByDishIds(@Param("ids") List<Long> ids);
 }

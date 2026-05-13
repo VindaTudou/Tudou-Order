@@ -1,4 +1,4 @@
-# 土豆外卖 (Tudou-Take-Out)
+# 土豆点餐 (Tudou-Order)
 
 基于 Spring Boot + Vue 2 的外卖管理系统，参考苍穹外卖项目进行开发。
 
@@ -18,7 +18,7 @@
 ## 项目结构
 
 ```
-Tudou-Take-Out/
+Tudou-Order/
 ├── dou-common/     公共模块：常量、枚举、异常、JSON 序列化、统一返回结果、ThreadLocal
 ├── dou-pojo/       数据模型：Entity、DTO、VO
 ├── dou-server/     Spring Boot 服务端：Controller、Service、Mapper、AOP、配置
@@ -73,7 +73,7 @@ tudou:
     username: root
     password: 你的密码
   upload:
-    path: /你的项目路径/Tudou-Take-Out/images/   # 图片上传目录，需改为你的实际路径
+    path: /你的项目路径/Tudou-Order/images/   # 图片上传目录，需改为你的实际路径
 ```
 
 同时修改 `dou-server/src/main/java/io/fangtudou/config/WebMvcConfiguration.java` 中的图片资源路径为你的实际路径。
@@ -96,10 +96,10 @@ mvn spring-boot:run
 
 ### 4. 启动前端
 
-前端由 nginx 托管，配置文件位于 `土豆外卖前端运行环境/nginx-1.20.2/conf/nginx-mac.conf`。
+前端由 nginx 托管，配置文件位于 `土豆点餐前端运行环境/nginx-1.20.2/conf/nginx-mac.conf`。
 
 ```bash
-cd 土豆外卖前端运行环境/nginx-1.20.2
+cd 土豆点餐前端运行环境/nginx-1.20.2
 ./start-mac.sh
 ```
 

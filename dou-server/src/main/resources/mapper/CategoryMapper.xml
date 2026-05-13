@@ -41,6 +41,13 @@
         where id = #{id}
     </update>
 
+    <select id="listByIds" resultType="Category">
+        select * from category where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
     <select id="list" resultType="Category">
         select * from category
         where status = 1

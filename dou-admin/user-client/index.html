@@ -213,6 +213,9 @@
 
                 <!-- Item Grid -->
                 <div class="item-area">
+                    <div style="background:#fff3cd;color:#856404;padding:12px 20px;text-align:center;font-size:14px;border-bottom:1px solid #ffc107;" v-if="shopOpen === 0">
+                        🛑 店铺已休息，暂时无法下单
+                    </div>
                     <div class="item-grid" v-loading="itemsLoading" v-if="items.length > 0">
                         <div v-for="item in items" :key="item._key" class="item-card" @click="showItemDetail(item)">
                             <img v-if="item.image" :src="item.image" class="item-img" @error="imgError">
@@ -243,8 +246,9 @@
                         <div class="cart-total">¥{{ cartTotalPrice }}</div>
                     </div>
                 </div>
-                <button class="checkout-btn" :disabled="cartTotalCount === 0" @click="checkout">
-                    去结算
+                <button class="checkout-btn" :disabled="cartTotalCount === 0 || shopOpen !== 1" @click="checkout">
+                    <span v-if="shopOpen !== 1">店铺休息中</span>
+                    <span v-else>去结算</span>
                 </button>
             </div>
 
@@ -456,6 +460,10 @@
             // --- Item Detail / Add to Cart ---
             showItemDetail(item) {
                 var self = this;
+                if (self.shopOpen !== 1) {
+                    self.$message.warning('店铺休息中，暂时无法下单');
+                    return;
+                }
 
                 // If dish has flavors, show flavor selection
                 if (item._type === 'dish' && item.flavors && item.flavors.length > 0) {
@@ -467,6 +475,10 @@
 
             addToCart(item, flavor) {
                 var self = this;
+                if (self.shopOpen !== 1) {
+                    self.$message.warning('店铺休息中，暂时无法下单');
+                    return;
+                }
 
                 // Generate unique key for cart entry
                 var key = item._key + (flavor ? '-' + flavor.id : '');
@@ -598,6 +610,10 @@
             // --- Checkout ---
             checkout() {
                 if (this.cartTotalCount === 0) return;
+                if (this.shopOpen !== 1) {
+                    this.$message.warning('店铺休息中，暂时无法下单');
+                    return;
+                }
                 if (!this.tableNumber) {
                     this.$message.warning('请先扫描桌面二维码');
                     return;

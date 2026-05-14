@@ -25,4 +25,5 @@ public class MessageConstant {
     public static final String ORDER_NOT_FOUND = "订单不存在";
     public static final String ALREADY_EXISTS = "已存在";
     public static final String DOWNLOAD_FAILED = "文件下载失败";
+    public static final String SHOP_CLOSED = "店铺休息中，暂时无法下单";
 }

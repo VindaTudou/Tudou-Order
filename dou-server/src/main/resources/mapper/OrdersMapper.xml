@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.fangtudou.mapper.OrdersMapper">
+
+    <select id="pageQuery" resultType="io.fangtudou.entity.Orders">
+        select * from orders
+        <where>
+            <if test="number != null and number != ''">
+                and number like concat('%',#{number},'%')
+            </if>
+            <if test="tableNumber != null">
+                and table_number = #{tableNumber}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="beginTime != null">
+                and order_time &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null">
+                and order_time &lt;= #{endTime}
+            </if>
+        </where>
+        order by order_time desc
+    </select>
+
+    <update id="update" parameterType="Orders">
+        update orders
+        <set>
+            <if test="status != null">status = #{status},</if>
+            <if test="completeTime != null">complete_time = #{completeTime},</if>
+            <if test="cancelReason != null">cancel_reason = #{cancelReason},</if>
+            <if test="cancelTime != null">cancel_time = #{cancelTime},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+</mapper>

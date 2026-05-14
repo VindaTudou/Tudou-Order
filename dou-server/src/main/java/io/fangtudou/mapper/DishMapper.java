@@ -81,4 +81,7 @@ public interface DishMapper {
     List<Dish> getByIds(@Param("ids") List<Long> ids);
 
     Integer countSetmealByDishIds(@Param("dishIds") List<Long> dishIds);
+
+    @Select("select count(*) from dish where status = #{status}")
+    Integer countByStatus(Integer status);
 }

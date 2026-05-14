@@ -23,7 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -113,5 +115,19 @@ public class OrderServiceImpl implements OrderService {
                 .build();
         ordersMapper.update(orders);
         log.info("订单已取消, id={}, reason={}", dto.getId(), dto.getCancelReason());
+    }
+
+    @Override
+    public Map<String, Object> statistics() {
+        // Status: 1=已接单, 2=已出餐, 3=已取消
+        Integer accepted = ordersMapper.countByStatusToday(1);
+        Integer completed = ordersMapper.countByStatusToday(2);
+        Integer cancelled = ordersMapper.countByStatusToday(3);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("toBeConfirmed", accepted != null ? accepted : 0);
+        map.put("confirmed", completed != null ? completed : 0);
+        map.put("deliveryInProgress", 0); // No delivery in new model
+        return map;
     }
 }

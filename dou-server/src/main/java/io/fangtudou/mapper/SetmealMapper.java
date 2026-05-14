@@ -71,4 +71,7 @@ public interface SetmealMapper {
             "<foreach collection='ids' item='id' open='(' separator=',' close=')'>#{id}</foreach>" +
             " and status = 1</script>")
     int anyEnabled(@Param("ids") List<Long> ids);
+
+    @Select("select count(*) from setmeal where status = #{status}")
+    Integer countByStatus(Integer status);
 }

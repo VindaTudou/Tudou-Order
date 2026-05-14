@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/admin/order")
 @Api(tags = "管理端-订单相关接口")
@@ -50,5 +52,12 @@ public class OrderController {
         log.info("取消订单: id={}, reason={}", dto.getId(), dto.getCancelReason());
         orderService.cancel(dto);
         return Result.success();
+    }
+
+    @GetMapping("/statistics")
+    @ApiOperation("订单状态统计")
+    public Result<Map<String, Object>> statistics() {
+        log.info("订单状态统计");
+        return Result.success(orderService.statistics());
     }
 }

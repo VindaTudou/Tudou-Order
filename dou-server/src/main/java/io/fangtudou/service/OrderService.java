@@ -7,6 +7,8 @@ import io.fangtudou.result.PageResult;
 import io.fangtudou.vo.OrderSubmitVO;
 import io.fangtudou.vo.OrderVO;
 
+import java.util.Map;
+
 public interface OrderService {
 
     OrderSubmitVO submit(OrdersSubmitDTO ordersSubmitDTO);
@@ -18,4 +20,6 @@ public interface OrderService {
     void complete(Long id);
 
     void cancel(OrdersCancelDTO dto);
+
+    Map<String, Object> statistics();
 }
